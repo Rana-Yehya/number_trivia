@@ -23,7 +23,8 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
     on<GetRandomNumberButtonPressed>(
         (event, emit) => getRandomNumberButtonPressed(event, emit));
   }
-
+	/* TODO */
+	// Add values to OutputText in State
   void onNumberChanged(OnNumberChanged event, Emitter<NumberState> emit) {
     emit(
       state.copyWith(
