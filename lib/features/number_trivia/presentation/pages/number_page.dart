@@ -1,25 +1,39 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/themes/size_config.dart';
+import '../../../../injection.dart';
+import '../bloc/number_bloc.dart';
+
 class NumberPage extends StatelessWidget {
   const NumberPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-		appBar: AppBar(
-			title: Text("Number Trivia"),
-		),
-		body: BlocProvider(
-			builder: (_) => getIt<NumberBloc>(),
-			child: SingleChildScrollView(
-			
-				child: NumberView(),
-			),
-		),
-	);
+      appBar: AppBar(
+        title: const Text("Number Trivia"),
+      ),
+      body: BlocProvider(
+        create: (_) => getIt<NumberBloc>(),
+        child: const SingleChildScrollView(
+          child: NumberView(),
+        ),
+      ),
+    );
   }
 }
-class NumberView extends StatelessWidget {
+
+class NumberView extends StatefulWidget {
   const NumberView({super.key});
-	/*
+
+  @override
+  State<NumberView> createState() => _NumberViewState();
+}
+
+class _NumberViewState extends State<NumberView> {
+  final controller = TextEditingController();
+  late String inputStr;
+  /*
 	
 	BlocConsumer<SignInFormBloc, SignInFormState>(
       listener: (context, state) {
@@ -31,175 +45,185 @@ class NumberView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NumberBloc, NumberState>(
-		listener: (context, state) {
-		
-			state.resultFailureOrSuccessOption.fold(
-			  () {},
-			  (either) {
-				either.fold(
-				  (failure) {
-				  
-				  failure.maybeMap(
-                    // Use localized strings here in your apps
-                    serverFailure: (_) => MessageDisplay('Server Failure'),
-                    cacheFailure: (_) => MessageDisplay('Cache Failure'),
-                    //invalidEnteredValueByUser: (_) => 'Email already in use',
-                    unknownFailure: (_) =>
-                        MessageDisplay('Unknown Failure'),
-                  ),
-
-				  },
-				  (_) {
-				  /*
+      listener: (context, state) {
+        state.resultFailureOrSuccessOption.fold(
+          () {},
+          (either) {
+            either.fold(
+              (failure) {
+                failure.maybeMap(
+                  // Use localized strings here in your apps
+                  serverFailure: (_) =>
+                      const MessageDisplay(message: 'Server Failure'),
+                  cacheFailure: (_) =>
+                      const MessageDisplay(message: 'Cache Failure'),
+                  //invalidEnteredValueByUser: (_) => 'Email already in use',
+                  unknownFailure: (_) =>
+                      const MessageDisplay(message: 'Unknown Failure'),
+                  orElse: () => const MessageDisplay(
+                      message: 'Unknown Failure. PLease contact support'),
+                );
+              },
+              (_) {
+                /*
 					Router.navigator.pushReplacementNamed(Router.notesOverviewPage);
 					context
 						.bloc<AuthBloc>()
 						.add(const AuthEvent.authCheckRequested());
 				  */
-				  },
-				);
-			  },
-			);
-			
-		},
-		builder: (context, state) {
-			return Center(
-			
-				child: if (state.isSubmitting) (
+              },
+            );
+          },
+        );
+      },
+      builder: (context, state) {
+        return Center(
+          child: (state.isSubmitting)
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height / 3,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
 
-					Container(
-						height: MediaQuery.of(context).size.height / 3,
-						child: Center(
-							child: CircularProgressIndicator(),
-						),
-					);
+              //} else {
+              : Padding(
+                  padding: EdgeInsets.all(SizeConfig.height! * 0.05),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: SizeConfig.height! * 0.05,
+                      ),
+                      //Center(
+                      //	height: SizeConfig().height * 0.3,
+                      //	child:  Column(
+                      //		children: [
 
-				) else {
-					Padding(
-						padding: const EdgeInsets.all( SizeConfig().height * 0.05 ),
-						child: Column(
-							children:[
-							
-								SizedBox(height: SizeConfig().height * 0.05,),
-								//Center(
-								//	height: SizeConfig().height * 0.3,
-								//	child:  Column(
-								//		children: [
-										
-								NumberDisplay("Number"),
-								MessageDisplay("result msg"),
-								//		],
-								//	),
-								//),
-								SizedBox(height: SizeConfig().height * 0.05,),
-								Column(
-									children: [
-										TextFormField(),
-										SizedBox(height: SizeConfig().height * 0.05,),
-										Row(
-											children:[
-											
-												Expanded(
-													child: Button() // getConcreteNumber
-												
-												),
-												Expanded(
-													child: Button() // getRandomNumber
-												
-												),
-											],
-											
-										),
-									],
-
-								),
-							],
-						),
-					),
-				},
-			);
-	
-		},
-	
-	);
-	
-
+                      const NumberDisplay(number: "Number"),
+                      const MessageDisplay(message: "result msg"),
+                      //		],
+                      //	),
+                      //),
+                      SizedBox(
+                        height: SizeConfig.height! * 0.05,
+                      ),
+                      Form(
+                        autovalidateMode: state.showErrorMsg,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: controller,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                hintText: 'Input a number',
+                              ),
+                              autocorrect: false,
+                              onChanged: (value) {
+                                inputStr = value;
+                                return context
+                                    .read<NumberBloc>()
+                                    .add(NumberEvent.onNumberChanged(
+                                      number: value,
+                                    ));
+                              },
+                              validator: (_) => context
+                                  .read<NumberBloc>()
+                                  .state
+                                  .number
+                                  .value
+                                  .fold(
+                                    (f) => f.maybeMap(
+                                      invalidEnteredValueByUser: (_) =>
+                                          'Invalid Number',
+                                      orElse: () => null,
+                                    ),
+                                    (_) => null,
+                                  ),
+                            ),
+                            SizedBox(
+                              height: SizeConfig.height! * 0.05,
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () => context
+                                        .read<NumberBloc>()
+                                        .add(const NumberEvent
+                                            .getConcreteNumberButtonPressed()),
+                                    child: const Text('Get Concrete'),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () => context
+                                        .read<NumberBloc>()
+                                        .add(const NumberEvent
+                                            .getRandomNumberButtonPressed()),
+                                    child: const Text('Get Random'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          //},
+        );
+      },
+    );
   }
 }
 
-
-class MessageDisplay extends StatelessWidget{
-	final String message;
-	const MessageDisplay{{required this.message ,super.key});
-
-	@override
-	Widget build(BuildContext context) {
-
-		return Container(
-			height: SizeConfig().height * 0.3,
-			child: Expanded( 
-				child: Center(
-					child: SingleChildScrollView(
-					
-						child: Text(message, 
-							style: TextStyle(fontSize: 25),
-							textAlign: TextAlign.center,
-							),
-					),
-				),
-			),
-		);
-	}
-}
-
-class NumberDisplay extends StatelessWidget{
-	final String number;
-	const NumberDisplay{{required this.number ,super.key});
-
-	@override
-	Widget build(BuildContext context) {
-
-		return Container(
-			height: SizeConfig().height * 0.3,
-			child: Center(
-				child: Text(number, 
-						style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,),
-						textAlign: TextAlign.center,
-						
-						),
-				
-				
-			),
-		);
-
-
-	}
-}
-
-
-class NumberControls extends StatefulWidget {
-  const NumberControls({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  _NumberControlsState createState() => _NumberControlsState();
-}
-
-class _NumberControlsState extends State<NumberControls> {
+class MessageDisplay extends StatelessWidget {
+  final String message;
+  const MessageDisplay({required this.message, super.key});
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        // Placeholders here...
-      ],
+    return SizedBox(
+      height: SizeConfig.height! * 0.3,
+      child: Expanded(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Text(
+              message,
+              style: const TextStyle(fontSize: 25),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NumberDisplay extends StatelessWidget {
+  final String number;
+  const NumberDisplay({required this.number, super.key});
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: SizeConfig.height! * 0.3,
+      child: Center(
+        child: Text(
+          number,
+          style: const TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }
 
 
 /*
-
 builder: (context, state) {
         return Form(
           autovalidate: state.showErrorMessages,

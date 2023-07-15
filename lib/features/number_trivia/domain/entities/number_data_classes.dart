@@ -36,7 +36,6 @@ class EmptyClass {
   const EmptyClass();
 }
 
-
 Either<Failure<String>, String> validateInputNumber(String value) {
   try {
     final intValue = int.parse(value);

@@ -3,10 +3,10 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../../core/errors/failure.dart';
-import '../../../domain/entities/number_data_classes.dart';
-import '../../../domain/entities/number_entity.dart';
-import '../../../domain/usecases/get_concrete_number.dart';
-import '../../../domain/usecases/get_random_number.dart';
+import '../../domain/entities/number_data_classes.dart';
+import '../../domain/entities/number_entity.dart';
+import '../../domain/usecases/get_concrete_number.dart';
+import '../../domain/usecases/get_random_number.dart';
 
 part 'number_event.dart';
 part 'number_state.dart';
@@ -15,7 +15,7 @@ part 'number_bloc.freezed.dart';
 class NumberBloc extends Bloc<NumberEvent, NumberState> {
   final GetConcreteNumber getConcreteNumber;
   final GetRandomNumber getRandomNumber;
-  NumberBloc(this.getConcreteNumber, this.getRandomNumber)
+  NumberBloc({required this.getConcreteNumber, required this.getRandomNumber})
       : super(NumberState.initial()) {
     on<OnNumberChanged>((event, emit) => onNumberChanged(event, emit));
     on<GetConcreteNumberButtonPressed>(
@@ -23,8 +23,8 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
     on<GetRandomNumberButtonPressed>(
         (event, emit) => getRandomNumberButtonPressed(event, emit));
   }
-	/* TODO */
-	// Add values to OutputText in State
+  /* TODO */
+  // Add values to OutputText in State
   void onNumberChanged(OnNumberChanged event, Emitter<NumberState> emit) {
     emit(
       state.copyWith(
