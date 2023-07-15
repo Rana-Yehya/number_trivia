@@ -14,9 +14,7 @@ void main() {
 
   setUp(() {
     mockNumberRepository = MockNumberRepository();
-    getConcreteNumber = GetConcreteNumber(
-      numberRepository: mockNumberRepository,
-    );
+    getConcreteNumber = GetConcreteNumber(mockNumberRepository);
   });
   setUpAll(() {
     registerFallbackValue(InputNumber('1'));

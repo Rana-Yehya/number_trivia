@@ -4,11 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:number_trivia/core/errors/failure.dart';
 import 'package:number_trivia/features/number_trivia/domain/entities/number_data_classes.dart';
-import 'package:number_trivia/features/number_trivia/domain/entities/number_entity.dart';
 import 'package:number_trivia/features/number_trivia/domain/usecases/get_concrete_number.dart';
 import 'package:number_trivia/features/number_trivia/domain/usecases/get_random_number.dart';
 import 'package:number_trivia/features/number_trivia/infrastructure/models/number_model.dart';
-import 'package:number_trivia/features/number_trivia/presentation/bloc/bloc/number_bloc.dart';
+import 'package:number_trivia/features/number_trivia/presentation/bloc/number_bloc.dart';
 import 'package:bloc_test/bloc_test.dart';
 
 class MockNumberBloc extends MockBloc<NumberEvent, NumberState>
@@ -40,7 +39,7 @@ void main() {
   setUp(() {
     mockGetConcreteNumber = MockGetConcreteNumber();
     mockGetRandomNumber = MockGetRandomNumber();
-    numberBloc = NumberBloc(mockGetConcreteNumber, mockGetRandomNumber);
+    numberBloc = NumberBloc(getConcreteNumber: mockGetConcreteNumber, getRandomNumber: mockGetRandomNumber);
     //mockNumberBloc = MockNumberBloc();
   });
   setUpAll(() {
@@ -357,8 +356,7 @@ void main() {
             .add(NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
         return numberBloc;
       },
-      act: (bloc) =>
-          bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
+      act: (bloc) => bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
       expect: () => (expectedResponse),
     );
 
@@ -367,12 +365,11 @@ void main() {
       build: () {
         when(() => mockGetRandomNumber.call(any()))
             .thenAnswer((_) async => const Left(Failure.serverFailure()));
-        numberBloc.add(
-            NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
+        numberBloc
+            .add(NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
         return numberBloc;
       },
-      act: (bloc) =>
-          bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
+      act: (bloc) => bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
       expect: () => (expectedServerFailureResponse),
     );
     blocTest<NumberBloc, NumberState>(
@@ -380,12 +377,11 @@ void main() {
       build: () {
         when(() => mockGetRandomNumber.call(any()))
             .thenAnswer((_) async => const Left(Failure.cacheFailure()));
-        numberBloc.add(
-            NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
+        numberBloc
+            .add(NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
         return numberBloc;
       },
-      act: (bloc) =>
-          bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
+      act: (bloc) => bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
       expect: () => (expectedCacheFailureResponse),
     );
     blocTest<NumberBloc, NumberState>(
@@ -393,14 +389,12 @@ void main() {
       build: () {
         when(() => mockGetRandomNumber.call(any())).thenAnswer(
             (_) async => const Left(Failure.unknownFailure('Unknown Failure')));
-        numberBloc.add(
-            NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
+        numberBloc
+            .add(NumberEvent.onNumberChanged(number: tNumberRandom.toString()));
         return numberBloc;
       },
-      act: (bloc) =>
-          bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
+      act: (bloc) => bloc.add(const NumberEvent.getRandomNumberButtonPressed()),
       expect: () => (expectedUnknownFailureResponse),
     );
-
   });
 }
