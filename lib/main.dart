@@ -3,8 +3,9 @@ import 'core/themes/size_config.dart';
 import 'features/number_trivia/presentation/pages/number_page.dart';
 import 'injection.dart' as getIt;
 
-void main() {
-  getIt.configureInjection();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await getIt.configureInjection();
   runApp(const MainAppWidget());
 }
 
@@ -17,6 +18,7 @@ class MainAppWidget extends StatelessWidget {
     SizeConfig().init(context);
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.green.shade800,
         hintColor: Colors.green.shade600,

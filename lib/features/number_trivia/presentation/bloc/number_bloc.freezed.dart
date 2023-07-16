@@ -473,8 +473,8 @@ mixin _$NumberState {
   InputNumber get number => throw _privateConstructorUsedError;
   OutputText get text => throw _privateConstructorUsedError;
   AutovalidateMode? get showErrorMsg => throw _privateConstructorUsedError;
-  bool get isSubmitting => throw _privateConstructorUsedError;
-  Option<Either<Failure, NumberEntity>> get resultFailureOrSuccessOption =>
+  bool get isSubmitting => throw _privateConstructorUsedError; //
+  Option<Either<Failure, Unit>> get resultFailureOrSuccessOption =>
       throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -493,7 +493,7 @@ abstract class $NumberStateCopyWith<$Res> {
       OutputText text,
       AutovalidateMode? showErrorMsg,
       bool isSubmitting,
-      Option<Either<Failure, NumberEntity>> resultFailureOrSuccessOption});
+      Option<Either<Failure, Unit>> resultFailureOrSuccessOption});
 }
 
 /// @nodoc
@@ -535,7 +535,7 @@ class _$NumberStateCopyWithImpl<$Res, $Val extends NumberState>
       resultFailureOrSuccessOption: null == resultFailureOrSuccessOption
           ? _value.resultFailureOrSuccessOption
           : resultFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<Failure, NumberEntity>>,
+              as Option<Either<Failure, Unit>>,
     ) as $Val);
   }
 }
@@ -553,7 +553,7 @@ abstract class _$$_NumberStateCopyWith<$Res>
       OutputText text,
       AutovalidateMode? showErrorMsg,
       bool isSubmitting,
-      Option<Either<Failure, NumberEntity>> resultFailureOrSuccessOption});
+      Option<Either<Failure, Unit>> resultFailureOrSuccessOption});
 }
 
 /// @nodoc
@@ -593,7 +593,7 @@ class __$$_NumberStateCopyWithImpl<$Res>
       resultFailureOrSuccessOption: null == resultFailureOrSuccessOption
           ? _value.resultFailureOrSuccessOption
           : resultFailureOrSuccessOption // ignore: cast_nullable_to_non_nullable
-              as Option<Either<Failure, NumberEntity>>,
+              as Option<Either<Failure, Unit>>,
     ));
   }
 }
@@ -616,8 +616,9 @@ class _$_NumberState implements _NumberState {
   final AutovalidateMode? showErrorMsg;
   @override
   final bool isSubmitting;
+//
   @override
-  final Option<Either<Failure, NumberEntity>> resultFailureOrSuccessOption;
+  final Option<Either<Failure, Unit>> resultFailureOrSuccessOption;
 
   @override
   String toString() {
@@ -629,8 +630,8 @@ class _$_NumberState implements _NumberState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_NumberState &&
-            (identical(other.number.value, number.value) || other.number.value == number.value) &&
-            (identical(other.text.value, text.value) || other.text.value == text.value) &&
+            (identical(other.number, number) || other.number == number) &&
+            (identical(other.text, text) || other.text == text) &&
             (identical(other.showErrorMsg, showErrorMsg) ||
                 other.showErrorMsg == showErrorMsg) &&
             (identical(other.isSubmitting, isSubmitting) ||
@@ -658,7 +659,7 @@ abstract class _NumberState implements NumberState {
       required final OutputText text,
       required final AutovalidateMode? showErrorMsg,
       required final bool isSubmitting,
-      required final Option<Either<Failure, NumberEntity>>
+      required final Option<Either<Failure, Unit>>
           resultFailureOrSuccessOption}) = _$_NumberState;
 
   @override
@@ -669,8 +670,8 @@ abstract class _NumberState implements NumberState {
   AutovalidateMode? get showErrorMsg;
   @override
   bool get isSubmitting;
-  @override
-  Option<Either<Failure, NumberEntity>> get resultFailureOrSuccessOption;
+  @override //
+  Option<Either<Failure, Unit>> get resultFailureOrSuccessOption;
   @override
   @JsonKey(ignore: true)
   _$$_NumberStateCopyWith<_$_NumberState> get copyWith =>

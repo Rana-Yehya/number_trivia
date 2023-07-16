@@ -49,6 +49,6 @@ Either<Failure<String>, String> validateInputNumber(String value) {
   } on SmallerThanZeroException catch (_) {
     return Left(Failure.invalidEnteredValueByUser());
   } catch (e) {
-    return Left(Failure.unknownFailure("e.mageess"));
+    return Left(Failure.unknownFailure(e.toString()));
   }
 }

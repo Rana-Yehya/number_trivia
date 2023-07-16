@@ -7,7 +7,8 @@ class NumberState with _$NumberState {
     required OutputText text,
     required AutovalidateMode? showErrorMsg,
     required bool isSubmitting,
-    required Option<Either<Failure, NumberEntity>> resultFailureOrSuccessOption,
+    //
+    required Option<Either<Failure, Unit>> resultFailureOrSuccessOption,
   }) = _NumberState;
 
   factory NumberState.initial() => NumberState(

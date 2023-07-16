@@ -14,7 +14,9 @@ import 'features/number_trivia/presentation/bloc/number_bloc.dart';
 final GetIt getIt = GetIt.instance;
 
 //@injectableInit
-Future<void> configureInjection(/*String env*/) async {
+Future<void> configureInjection(/*String env*/) async {  
+  final sharedPreferences = await SharedPreferences.getInstance();
+
   getIt.registerFactory(
     () => NumberBloc(
       getConcreteNumber: getIt(),
@@ -41,7 +43,6 @@ Future<void> configureInjection(/*String env*/) async {
 
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(getIt()));
 
-  final sharedPreferences = await SharedPreferences.getInstance();
 
   getIt.registerLazySingleton(() => sharedPreferences);
   getIt.registerLazySingleton(() => http.Client());

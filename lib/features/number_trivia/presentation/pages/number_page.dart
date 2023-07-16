@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/themes/size_config.dart';
 import '../../../../injection.dart';
 import '../bloc/number_bloc.dart';
+import '../widgets/message_display.dart';
+import '../widgets/number_display.dart';
 
 class NumberPage extends StatelessWidget {
   const NumberPage({super.key});
@@ -32,7 +34,7 @@ class NumberView extends StatefulWidget {
 
 class _NumberViewState extends State<NumberView> {
   final controller = TextEditingController();
-  late String inputStr;
+  late String inputStr= '0';
   /*
 	
 	BlocConsumer<SignInFormBloc, SignInFormState>(
@@ -42,9 +44,17 @@ class _NumberViewState extends State<NumberView> {
       builder: (context, state) {
 	
 	*/
+  void updateInputStr(String value){
+
+
+    setState(() {
+      inputStr = value;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NumberBloc, NumberState>(
+      listenWhen: (previous, current) => previous.isSubmitting != current.isSubmitting,
       listener: (context, state) {
         state.resultFailureOrSuccessOption.fold(
           () {},
@@ -64,7 +74,9 @@ class _NumberViewState extends State<NumberView> {
                       message: 'Unknown Failure. PLease contact support'),
                 );
               },
-              (_) {
+              (_) 
+              {
+                updateInputStr(state.number.getOrCrash());
                 /*
 					Router.navigator.pushReplacementNamed(Router.notesOverviewPage);
 					context
@@ -80,32 +92,32 @@ class _NumberViewState extends State<NumberView> {
         return Center(
           child: (state.isSubmitting)
               ? SizedBox(
-                  height: MediaQuery.of(context).size.height / 3,
+                  height: SizeConfig.height! *0.3,
                   child: const Center(
                     child: CircularProgressIndicator(),
                   ),
                 )
-
+              
               //} else {
               : Padding(
-                  padding: EdgeInsets.all(SizeConfig.height! * 0.05),
+                  padding: EdgeInsets.all(SizeConfig.height! * 0.01),
                   child: Column(
                     children: [
                       SizedBox(
-                        height: SizeConfig.height! * 0.05,
+                        height: SizeConfig.height! * 0.01,
                       ),
                       //Center(
                       //	height: SizeConfig().height * 0.3,
                       //	child:  Column(
                       //		children: [
-
-                      const NumberDisplay(number: "Number"),
-                      const MessageDisplay(message: "result msg"),
+                      // getOrCrash()
+                      //NumberDisplay(number: inputStr),
+                      MessageDisplay(message: state.text.value),
                       //		],
                       //	),
                       //),
                       SizedBox(
-                        height: SizeConfig.height! * 0.05,
+                        height: SizeConfig.height! * 0.01,
                       ),
                       Form(
                         autovalidateMode: state.showErrorMsg,
@@ -119,7 +131,7 @@ class _NumberViewState extends State<NumberView> {
                               ),
                               autocorrect: false,
                               onChanged: (value) {
-                                inputStr = value;
+                                //inputStr = value;
                                 return context
                                     .read<NumberBloc>()
                                     .add(NumberEvent.onNumberChanged(
@@ -146,21 +158,37 @@ class _NumberViewState extends State<NumberView> {
                             Row(
                               children: <Widget>[
                                 Expanded(
+                                  flex: 1,
                                   child: ElevatedButton(
-                                    onPressed: () => context
+                                    onPressed: () {
+                                      controller.clear();
+                                      context
                                         .read<NumberBloc>()
                                         .add(const NumberEvent
-                                            .getConcreteNumberButtonPressed()),
+                                            .getConcreteNumberButtonPressed());
+
+                                      print('state in view: ') ;
+                                      print(state) ;
+                                      
+                                            
+                                    },
                                     child: const Text('Get Concrete'),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
+                                  flex: 1,
                                   child: ElevatedButton(
-                                    onPressed: () => context
+                                    onPressed: () {
+                                      controller.clear();
+                                      context
                                         .read<NumberBloc>()
                                         .add(const NumberEvent
-                                            .getRandomNumberButtonPressed()),
+                                            .getRandomNumberButtonPressed());
+                                            
+                                      //updateInputStr(state.number.getOrCrash());
+                                            
+                                    },
                                     child: const Text('Get Random'),
                                   ),
                                 ),
@@ -179,48 +207,8 @@ class _NumberViewState extends State<NumberView> {
   }
 }
 
-class MessageDisplay extends StatelessWidget {
-  final String message;
-  const MessageDisplay({required this.message, super.key});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: SizeConfig.height! * 0.3,
-      child: Expanded(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Text(
-              message,
-              style: const TextStyle(fontSize: 25),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
-class NumberDisplay extends StatelessWidget {
-  final String number;
-  const NumberDisplay({required this.number, super.key});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: SizeConfig.height! * 0.3,
-      child: Center(
-        child: Text(
-          number,
-          style: const TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-}
+
 
 
 /*

@@ -43,13 +43,26 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
       ),
     );
     final result = await getConcreteNumber(state.number);
-    emit(
-      state.copyWith(
-        isSubmitting: false,
-        showErrorMsg: AutovalidateMode.onUserInteraction,
-        resultFailureOrSuccessOption: some(result),
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          isSubmitting: false,
+          showErrorMsg: AutovalidateMode.onUserInteraction,
+          resultFailureOrSuccessOption: optionOf(Left(failure)),
+        ),
+      ),
+      (value) => emit(
+        state.copyWith(
+          isSubmitting: false,
+          text: value.text,
+          //number: InputNumber('20'),//value.number,
+          showErrorMsg: AutovalidateMode.onUserInteraction,
+          resultFailureOrSuccessOption: none(),
+        ),
       ),
     );
+    print('state in bloc: ') ;
+    print(state) ;
   }
 
   Future<void> getRandomNumberButtonPressed(
@@ -61,11 +74,22 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
       ),
     );
     final result = await getRandomNumber(const EmptyClass());
-    emit(
-      state.copyWith(
-        isSubmitting: false,
-        showErrorMsg: AutovalidateMode.onUserInteraction,
-        resultFailureOrSuccessOption: some(result),
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          isSubmitting: false,
+          showErrorMsg: AutovalidateMode.onUserInteraction,
+          resultFailureOrSuccessOption: optionOf(Left(failure)),
+        ),
+      ),
+      (value) => emit(
+        state.copyWith(
+          isSubmitting: false,
+          number: value.number,//InputNumber('20'),//value.number,
+          text: value.text,
+          showErrorMsg: AutovalidateMode.onUserInteraction,
+          resultFailureOrSuccessOption: none(),
+        ),
       ),
     );
   }

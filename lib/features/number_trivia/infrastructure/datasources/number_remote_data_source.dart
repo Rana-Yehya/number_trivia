@@ -26,12 +26,12 @@ class NumberRemoteDataSourceImpl extends NumberRemoteDataSource {
 
   @override
   Future<NumberModel> getConcreteNumber(int number) {
-    return _getDataFromUrl('http://numbersapi.com/$number');
+    return _getDataFromUrl('http://numbersapi.com/$number?json');
   }
 
   @override
   Future<NumberModel> getRandomNumber() {
-    return _getDataFromUrl('http://numbersapi.com/random');
+    return _getDataFromUrl('http://numbersapi.com/random?json');
   }
 
   Future<NumberModel> _getDataFromUrl(String url) async {
