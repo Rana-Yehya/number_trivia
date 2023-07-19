@@ -55,14 +55,13 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
         state.copyWith(
           isSubmitting: false,
           text: value.text,
-          //number: InputNumber('20'),//value.number,
+          number: value.number,
           showErrorMsg: AutovalidateMode.onUserInteraction,
           resultFailureOrSuccessOption: none(),
         ),
       ),
     );
-    print('state in bloc: ') ;
-    print(state) ;
+    print(state);
   }
 
   Future<void> getRandomNumberButtonPressed(
@@ -92,5 +91,7 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
         ),
       ),
     );
+
+    //print(state);
   }
 }

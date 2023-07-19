@@ -17,11 +17,9 @@ class MainAppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return MaterialApp(
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.green.shade800,
-        hintColor: Colors.green.shade600,
+        primaryColor: Colors.purple[800],
         //colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

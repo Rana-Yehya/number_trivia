@@ -6,9 +6,9 @@ class MessageDisplay extends StatelessWidget {
   const MessageDisplay({required this.message, super.key});
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: SizeConfig.height! * 0.3,
-      child: Expanded(
+      //child: Expanded(
         child: Center(
           child: SingleChildScrollView(
             child: Text(
@@ -18,7 +18,8 @@ class MessageDisplay extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      //),
+
     );
   }
 }

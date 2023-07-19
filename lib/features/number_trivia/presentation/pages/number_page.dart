@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
+import 'package:number_trivia/features/number_trivia/presentation/widgets/number_display.dart';
 import '../../../../core/themes/size_config.dart';
 import '../../../../injection.dart';
 import '../bloc/number_bloc.dart';
 import '../widgets/message_display.dart';
-import '../widgets/number_display.dart';
 
 class NumberPage extends StatelessWidget {
   const NumberPage({super.key});
@@ -34,56 +35,39 @@ class NumberView extends StatefulWidget {
 
 class _NumberViewState extends State<NumberView> {
   final controller = TextEditingController();
-  late String inputStr= '0';
-  /*
-	
-	BlocConsumer<SignInFormBloc, SignInFormState>(
-      listener: (context, state) {
-        
-      },
-      builder: (context, state) {
-	
-	*/
-  void updateInputStr(String value){
-
-
-    setState(() {
-      inputStr = value;
-    });
+  late String text;
+  late String number;
+  @override
+  void initState() {
+    super.initState();
+    text = "Enter a value";
+    number = '';
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NumberBloc, NumberState>(
-      listenWhen: (previous, current) => previous.isSubmitting != current.isSubmitting,
+      listenWhen: (previous, current) =>
+          previous.isSubmitting != current.isSubmitting,
       listener: (context, state) {
         state.resultFailureOrSuccessOption.fold(
-          () {},
+          () {number = state.number.getOrCrash(); 
+            text = state.text.value;},
           (either) {
             either.fold(
               (failure) {
                 failure.maybeMap(
-                  // Use localized strings here in your apps
                   serverFailure: (_) =>
                       const MessageDisplay(message: 'Server Failure'),
-                  cacheFailure: (_) =>
-                      const MessageDisplay(message: 'Cache Failure'),
+                  cacheFailure: (_) => text = "Cache Failure",
+                  //const MessageDisplay(message: 'Cache Failure'),
                   //invalidEnteredValueByUser: (_) => 'Email already in use',
                   unknownFailure: (_) =>
-                      const MessageDisplay(message: 'Unknown Failure'),
-                  orElse: () => const MessageDisplay(
-                      message: 'Unknown Failure. PLease contact support'),
+                      const MessageDisplay(message: 'Unknown Failure. PLease contact support'),
+                  orElse: () => text = "",
                 );
               },
-              (_) 
-              {
-                updateInputStr(state.number.getOrCrash());
-                /*
-					Router.navigator.pushReplacementNamed(Router.notesOverviewPage);
-					context
-						.bloc<AuthBloc>()
-						.add(const AuthEvent.authCheckRequested());
-				  */
-              },
+              (_) {},
             );
           },
         );
@@ -92,282 +76,97 @@ class _NumberViewState extends State<NumberView> {
         return Center(
           child: (state.isSubmitting)
               ? SizedBox(
-                  height: SizeConfig.height! *0.3,
+                  height: SizeConfig.height! * 0.3,
                   child: const Center(
                     child: CircularProgressIndicator(),
                   ),
                 )
-              
-              //} else {
               : Padding(
                   padding: EdgeInsets.all(SizeConfig.height! * 0.01),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: SizeConfig.height! * 0.01,
-                      ),
-                      //Center(
-                      //	height: SizeConfig().height * 0.3,
-                      //	child:  Column(
-                      //		children: [
-                      // getOrCrash()
-                      //NumberDisplay(number: inputStr),
-                      MessageDisplay(message: state.text.value),
-                      //		],
-                      //	),
-                      //),
-                      SizedBox(
-                        height: SizeConfig.height! * 0.01,
-                      ),
-                      Form(
-                        autovalidateMode: state.showErrorMsg,
-                        child: Column(
+                  child: Form(
+                    autovalidateMode: state.showErrorMsg,
+                    child: Column(
+                      children: [
+                        Column(
                           children: [
-                            TextFormField(
-                              controller: controller,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                hintText: 'Input a number',
-                              ),
-                              autocorrect: false,
-                              onChanged: (value) {
-                                //inputStr = value;
-                                return context
-                                    .read<NumberBloc>()
-                                    .add(NumberEvent.onNumberChanged(
-                                      number: value,
-                                    ));
-                              },
-                              validator: (_) => context
-                                  .read<NumberBloc>()
-                                  .state
-                                  .number
-                                  .value
-                                  .fold(
-                                    (f) => f.maybeMap(
-                                      invalidEnteredValueByUser: (_) =>
-                                          'Invalid Number',
-                                      orElse: () => null,
-                                    ),
-                                    (_) => null,
-                                  ),
+                            Container(
+                              height: SizeConfig.height! * 0.01,
                             ),
-                            SizedBox(
-                              height: SizeConfig.height! * 0.05,
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  flex: 1,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      controller.clear();
-                                      context
-                                        .read<NumberBloc>()
-                                        .add(const NumberEvent
-                                            .getConcreteNumberButtonPressed());
-
-                                      print('state in view: ') ;
-                                      print(state) ;
-                                      
-                                            
-                                    },
-                                    child: const Text('Get Concrete'),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  flex: 1,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      controller.clear();
-                                      context
-                                        .read<NumberBloc>()
-                                        .add(const NumberEvent
-                                            .getRandomNumberButtonPressed());
-                                            
-                                      //updateInputStr(state.number.getOrCrash());
-                                            
-                                    },
-                                    child: const Text('Get Random'),
-                                  ),
-                                ),
-                              ],
+                            NumberDisplay(number: number,),
+                            //MessageDisplay(message: state.text.value),
+                            MessageDisplay(message:/* text == ""? state.text.value : */text),
+                            Container(
+                              height: SizeConfig.height! * 0.01,
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-          //},
-        );
-      },
-    );
-  }
-}
-
-
-
-
-
-/*
-builder: (context, state) {
-        return Form(
-          autovalidate: state.showErrorMessages,
-          child: ListView(
-            padding: const EdgeInsets.all(8.0),
-            children: <Widget>[
-              const Text(
-                '📝',
-              ).textAlignment(TextAlign.center).fontSize(130),
-              const SizedBox(height: 8),
-              TextFormField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  labelText: 'Email',
-                ),
-                autocorrect: false,
-                onChanged: (value) => context
-                    .bloc<SignInFormBloc>()
-                    .add(SignInFormEvent.emailChanged(value)),
-                validator: (_) => context
-                    .bloc<SignInFormBloc>()
-                    .state
-                    .emailAddress
-                    .value
-                    .fold(
-                      (f) => f.maybeMap(
-                        invalidEmail: (_) => 'Invalid email',
-                        orElse: () => null,
-                      ),
-                      (_) => null,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                // controller: passwordController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock),
-                  labelText: 'Password',
-                ),
-                obscureText: true,
-                autocorrect: false,
-                onChanged: (value) => context
-                    .bloc<SignInFormBloc>()
-                    .add(SignInFormEvent.passwordChanged(value)),
-                validator: (_) =>
-                    context.bloc<SignInFormBloc>().state.password.value.fold(
-                          (f) => f.maybeMap(
-                            shortPassword: (_) => 'Short password',
-                            orElse: () => null,
+                        TextFormField(
+                          cursorColor: Theme.of(context).primaryColor,
+                          controller: controller,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: 'Input a number',
                           ),
-                          (_) => null,
+                          autocorrect: false,
+                          onChanged: (value) {
+                            return context
+                                .read<NumberBloc>()
+                                .add(NumberEvent.onNumberChanged(
+                                  number: value,
+                                ));
+                          },
+                          validator: (_) => context
+                              .read<NumberBloc>()
+                              .state
+                              .number
+                              .value
+                              .fold(
+                                (f) => f.maybeMap(
+                                  invalidEnteredValueByUser: (_) =>
+                                      'Invalid Number',
+                                  orElse: () => null,
+                                ),
+                                (_) => null,
+                              ),
                         ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: FlatButton(
-                      onPressed: () => context.bloc<SignInFormBloc>().add(
-                          const SignInFormEvent
-                              .signInWithEmailAndPasswordPressed()),
-                      child: const Text('SIGN IN'),
+                        Container(
+                          height: SizeConfig.height! * 0.05,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Padding(padding: EdgeInsets.only(right: SizeConfig.width! * 0.03),),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  controller.clear();
+                                  context.read<NumberBloc>().add(
+                                      const NumberEvent
+                                          .getConcreteNumberButtonPressed());
+                                },
+                                child: const Text('Get Concrete'),
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.only(right: SizeConfig.width! * 0.05),),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  controller.clear();
+                                  context.read<NumberBloc>().add(
+                                      const NumberEvent
+                                          .getRandomNumberButtonPressed());
+                                },
+                                child: const Text('Get Random'),
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.only(right: SizeConfig.width! * 0.03),),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: FlatButton(
-                      onPressed: () => context.bloc<SignInFormBloc>().add(
-                          const SignInFormEvent
-                              .registerWithEmailAndPasswordPressed()),
-                      child: const Text('REGISTER'),
-                    ),
-                  ),
-                ],
-              ),
-              RaisedButton(
-                onPressed: () => context
-                    .bloc<SignInFormBloc>()
-                    .add(const SignInFormEvent.signInWithGooglePressed()),
-                color: Colors.lightBlue,
-                child: const Text(
-                  'SIGN IN WITH GOOGLE',
-                ).textColor(Colors.white).bold(),
-              ),
-              if (state.isSubmitting) ...[
-                const SizedBox(height: 8),
-                const LinearProgressIndicator(value: null),
-              ]
-            ],
-          ),
+                ),
         );
       },
-
-*/
-
-
-/*
-
-class _TriviaControlsState extends State<TriviaControls> {
-  final controller = TextEditingController();
-  String inputStr;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Input a number',
-          ),
-          onChanged: (value) {
-            inputStr = value;
-          },
-          onSubmitted: (_) {
-            dispatchConcrete();
-          },
-        ),
-        SizedBox(height: 10),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: RaisedButton(
-                child: Text('Search'),
-                color: Theme.of(context).accentColor,
-                textTheme: ButtonTextTheme.primary,
-                onPressed: dispatchConcrete,
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: RaisedButton(
-                child: Text('Get random trivia'),
-                onPressed: dispatchRandom,
-              ),
-            ),
-          ],
-        )
-      ],
     );
   }
-
-  void dispatchConcrete() {
-    // Clearing the TextField to prepare it for the next inputted number
-    controller.clear();
-    BlocProvider.of<NumberTriviaBloc>(context)
-        .dispatch(GetTriviaForConcreteNumber(inputStr));
-  }
-
-  void dispatchRandom() {
-    controller.clear();
-    BlocProvider.of<NumberTriviaBloc>(context)
-        .dispatch(GetTriviaForRandomNumber());
-  }
 }
-
-*/
